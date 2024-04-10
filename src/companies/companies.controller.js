@@ -7,10 +7,10 @@ async function listCompanies(req, res){
 
 async function validateCompanyId(req, res, next){
     const {company_id} = req.params;
-    if(!company_id) return next(400, "no company id provided");
+    if(!company_id) return next("no company id provided");
     // check if id exists
     const company = await service.getCompany(company_id);
-    if(!company) return next(400, "no such company");
+    if(!company) return next("no such company");
     res.locals.company = company;
     next();
 }
@@ -30,8 +30,7 @@ function validateCompany(req, res, next){
     for (const field of fields) {
         if(company[field] === undefined) {
             const message = `Missing field ${field}!`;
-            console.log(message);
-            return next(400, message);
+            return next(message);
         }
     }
     res.locals.company = company;

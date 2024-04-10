@@ -1,5 +1,4 @@
 const service = require("./users.service");
-const offerService = require("../offers/offers.service");
 
 async function listUsers(req, res){
     const users = await service.listUsers();
@@ -8,10 +7,10 @@ async function listUsers(req, res){
 
 async function validateUserId(req, res, next){
     const {user_id} = req.params;
-    if(!user_id) return next(400, "no user id provided");
+    if(!user_id) return next("no user id provided");
     // check if id exists
     const user = await service.getUser(user_id);
-    if(!user) return next(400, "no such user");
+    if(!user) return next("no such user");
     res.locals.user = user;
     next();
 }
@@ -30,36 +29,12 @@ function hashPassword(req, res, next){
 async function loginUser(req, res, next){
     const requiredFields = ["user_name"];
     for (const field of requiredFields) {
-        if(!req.body[field]) return next(400, `Required field '${field}' not found!`);
+        if(!req.body[field]) return next(`Required field '${field}' not found!`);
     }
     const user = await service.loginUser(req.body.user_name, null);
     console.log(user)
-    if(!user) return next(400, "Invalid login");
+    if(!user) return next("Invalid login");
     res.send(user);
-}
-
-async function hasUserIdBody(req, res, next){
-    if(!req.body.user_id) return next(400, "No user_id query param!");
-    const user = await service.getUser(req.body.user_id);
-    if(!user) return next(400, "Invalid user_id query param!");
-    res.locals.user = user;
-    next();
-}
-async function hasOfferIdBody(req, res, next){
-    if(!req.body.offer_id) return next(400, "No offer_id body param!");
-    const offer = await offerService.getOffer(req.body.offer_id);
-    if(!offer) return next(400, "Invalid offer_id body param!");
-    res.locals.offer = offer;
-    next();
-}
-
-async function followOffer(req, res){
-    const data = await service.followOffer(res.locals.user.user_id, res.locals.offer.offer_id);
-    res.send(data[0]);
-}
-async function unfollowOffer(req, res){
-    await service.unfollowOffer(res.locals.user.user_id, res.locals.offer.offer_id);
-    res.send({message: "ok"});
 }
 
 function validateUser(req, res, next){
@@ -72,7 +47,7 @@ function validateUser(req, res, next){
         if(user[field] === undefined) {
             const message = `Missing field ${field}!`;
             console.log(message);
-            return next(400, message);
+            return next(message);
         }
     }
     res.locals.user = user;
@@ -89,7 +64,5 @@ module.exports = {
     listUsers,
     getUser: [validateUserId, getUser],
     loginUser: [hashPassword, loginUser],
-    followOffer: [hasUserIdBody, hasOfferIdBody, followOffer],
-    unfollowOffer: [hasUserIdBody, hasOfferIdBody, unfollowOffer],
     postUser: [validateUser, postUser],
 };

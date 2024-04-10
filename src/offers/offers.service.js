@@ -5,19 +5,6 @@ function listOffers(){
     .join("companies", "offers.company_id", "=", "companies.company_id")
     .select("*");
 }
-function listOffersFollowed(user_id){
-    return db("user_offers").where({user_id})
-    .join("offers", "user_offers.offer_id", "=", "offers.offer_id")
-    .join("companies", "offers.company_id", "=", "companies.company_id")
-    .select("*");
-}
-function listOffersNotFollowed(user_id){
-    return db("user_offers").whereNot('user_id', user_id).orWhereNull("user_id")
-    .fullOuterJoin("offers", "user_offers.offer_id", "=", "offers.offer_id")
-    .join("companies", "offers.company_id", "=", "companies.company_id")
-    .select("*");
-    // return db("user_offers").whereNot('user_id', user_id).join("offers", "user_offers.offer_id", "=", "offers.offer_id").select("*");
-}
 
 function getOffer(offer_id){
     return db("offers").where({offer_id}).join("companies", "offers.company_id", "=", "companies.company_id").select("*").first();
@@ -37,8 +24,6 @@ function deleteOffer(offer_id){
 
 module.exports = {
     listOffers,
-    listOffersFollowed,
-    listOffersNotFollowed,
     getOffer,
     postOffer,
     updateOffer,

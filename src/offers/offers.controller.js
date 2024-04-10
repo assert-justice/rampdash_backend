@@ -2,40 +2,16 @@ const service = require("./offers.service");
 const companiesService = require("../companies/companies.service");
 
 async function listOffers(req, res){
-    const {user_id, following} = req.query;
-    let offers;
-    if(user_id){
-        if(following){
-            offers = await service.listOffersFollowed(user_id);
-        }
-        else{
-            // offers = await service.listOffersNotFollowed(user_id);
-            offers = await service.listOffersNotFollowed(user_id);
-            // whereNot isn't working
-            // offers = offers.filter(c=>c.user_id != user_id);
-        }
-    }
-    else{
-        offers = await service.listOffers();
-    }
-    // should do this in sql but dgaf
-    const offerIds = new Set();
-    offers = offers.filter(o => {
-        if(offerIds.has(o.offer_id)) return false;
-        offerIds.add(o.offer_id);
-        delete o.user_offer_id;
-        delete o.user_id;
-        return true;
-    })
+    let offers = await service.listOffers();
     res.send(offers);
 }
 
 async function validateOfferId(req, res, next){
     const {offer_id} = req.params;
-    if(!offer_id) return next(400, "no offer id provided");
+    if(!offer_id) return next("no offer id provided");
     // check if id exists
     const offer = await service.getOffer(offer_id);
-    if(!offer) return next(400, "no such offer");
+    if(!offer) return next("no such offer");
     res.locals.offer = offer;
     next();
 }
@@ -55,6 +31,7 @@ function validateOffer(req, res, next){
         "offer_title",
         "offer_types",
         "offer_details",
+        "offer_link",
         "offer_expires",
         "company_id",
     ];
@@ -62,12 +39,12 @@ function validateOffer(req, res, next){
         if(offer[field] === undefined) {
             const message = `Missing field ${field}!`;
             console.log(message);
-            return next(400, message);
+            return next(message);
         }
     }
     // check id exists
     const company = companiesService.getCompany(offer.company_id);
-    if(!company) return next(400, "no such company");
+    if(!company) return next("no such company");
     res.locals.offer = offer;
     res.locals.company = company;
     next();

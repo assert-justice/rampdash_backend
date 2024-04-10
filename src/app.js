@@ -17,4 +17,8 @@ app.get("/", (req, res) => {
     res.send('Hello World!')
 });
 
+const jsonErrorHandler = (err, req, res, next) => {
+    res.status(400).send({ error: err });
+}
+app.use(jsonErrorHandler)
 module.exports = app;

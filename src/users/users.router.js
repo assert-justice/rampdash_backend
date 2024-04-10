@@ -14,10 +14,10 @@ router.post("/login", controller.loginUser);
 router.get("/:user_id", controller.getUser);
 
 // follow an offer, user_id and offer_id passed in via query params
-router.post("/follow_offer", controller.followOffer);
+// router.post("/follow_offer", controller.followOffer);
 
 // unfollow an offer, user_id and offer_id passed in via query params
-router.delete("/unfollow_offer", controller.unfollowOffer);
+// router.delete("/unfollow_offer", controller.unfollowOffer);
 
 // post a new user
 router.post("/", controller.postUser);
