@@ -17,10 +17,24 @@ exports.up = function(knex) {
         table.string("offer_types").notNullable();
         table.string("offer_details").notNullable();
         table.string("offer_link").notNullable();
-        table.dateTime("offer_expires").notNullable();
         table.integer("company_id").index()
         .references("company_id")
         .inTable("companies")
+        .onUpdate("CASCADE")
+        .onDelete("CASCADE")
+        .notNullable();
+    })
+    .createTable("colleges", (table)=>{
+        table.increments("college_id").notNullable();
+        table.string("college_name").notNullable();
+        table.string("college_logo").notNullable();
+    })
+    .createTable("groups", (table)=>{
+        table.increments("group_id").notNullable();
+        table.string("group_name").notNullable();
+        table.integer("college_id").index()
+        .references("college_id")
+        .inTable("colleges")
         .onUpdate("CASCADE")
         .onDelete("CASCADE")
         .notNullable();
@@ -29,11 +43,18 @@ exports.up = function(knex) {
         table.increments("user_id").notNullable();
         table.string("user_name").notNullable();
         table.string("user_role").notNullable();
+        table.integer("group_id").index()
+        .references("group_id")
+        .inTable("groups")
+        .onUpdate("CASCADE")
+        .onDelete("CASCADE");
+        table.integer("college_id").index()
+        .references("college_id")
+        .inTable("colleges")
+        .onUpdate("CASCADE")
+        .onDelete("CASCADE")
+        .notNullable();
     })
-    // .createTable("groups", (table)=>{
-    //     table.increments("group_id").notNullable();
-    //     table.string("group_name").notNullable();
-    // })
     // .createTable("group_users", (table)=>{
     //     table.increments("group_user_id").notNullable();
     //     table.integer("group_id").index()
@@ -57,9 +78,9 @@ exports.up = function(knex) {
  */
 exports.down = function(knex) {
     return knex.schema
-    .dropTable("group_users")
-    .dropTable("groups")
     .dropTable("users")
+    .dropTable("groups")
+    .dropTable("colleges")
     .dropTable("offers")
     .dropTable("companies")
 };

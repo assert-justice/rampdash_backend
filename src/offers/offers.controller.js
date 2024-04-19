@@ -32,7 +32,6 @@ function validateOffer(req, res, next){
         "offer_types",
         "offer_details",
         "offer_link",
-        "offer_expires",
         "company_id",
     ];
     for (const field of fields) {

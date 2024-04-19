@@ -1,4 +1,6 @@
 const service = require("./users.service");
+const collegeService = require("../colleges/colleges.service");
+const groupService = require("../groups/groups.service");
 
 async function listUsers(req, res){
     const users = await service.listUsers();
@@ -42,6 +44,7 @@ function validateUser(req, res, next){
     const fields = [
         "user_name",
         "user_role",
+        "college_id",
     ];
     for (const field of fields) {
         if(user[field] === undefined) {
@@ -51,6 +54,16 @@ function validateUser(req, res, next){
         }
     }
     res.locals.user = user;
+    const college = collegesService.getCollege(user.college_id);
+    if(!college) return next("no such college");
+    res.locals.college = college;
+    if(user.group_id === undefined){
+        return next();
+    }
+    const group = groupService.getCollege(user.group_id);
+    if(!college) return next("no such group");
+    if(group.college_id !== user.college_id) return next("user college and group college do not match");
+    res.locals.group = group;
     next();
 }
 
