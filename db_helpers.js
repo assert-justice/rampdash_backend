@@ -1,8 +1,4 @@
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
-exports.up = function(knex) {
+function up(knex) {
     return knex.schema
     .createTable("companies", (table)=>{
         table.increments("company_id").notNullable();
@@ -34,8 +30,7 @@ exports.up = function(knex) {
         .references("company_id")
         .inTable("companies")
         .onUpdate("CASCADE")
-        .onDelete("CASCADE")
-        .notNullable();
+        .onDelete("CASCADE");
         table.integer("college_id").index()
         .references("college_id")
         .inTable("colleges")
@@ -62,17 +57,15 @@ exports.up = function(knex) {
         .onUpdate("CASCADE")
         .onDelete("CASCADE");
     })
+}
+
+function down(knex) {
+    return knex.schema
+    .dropTableIfExists("users")
+    .dropTableIfExists("offers")
+    .dropTableIfExists("groups")
+    .dropTableIfExists("companies")
+    .dropTableIfExists("colleges")
 };
 
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
-exports.down = function(knex) {
-    return knex.schema
-    .dropTable("users")
-    .dropTable("offers")
-    .dropTable("groups")
-    .dropTable("companies")
-    .dropTable("colleges")
-};
+module.exports = {up, down};

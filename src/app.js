@@ -4,6 +4,7 @@ const app = express();
 const companies = require("./companies/companies.router");
 const offers = require("./offers/offers.router");
 const users = require("./users/users.router");
+const colleges = require("./colleges/colleges.router");
 
 app.use(cors());
 app.use(express.json());
@@ -12,6 +13,7 @@ app.use(express.json());
 app.use("/companies", companies);
 app.use("/offers", offers);
 app.use("/users", users);
+app.use("/colleges", colleges);
 
 app.get("/", (req, res) => {
     res.send('Hello World!')

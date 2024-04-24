@@ -34,7 +34,6 @@ function validateGroup(req, res, next){
     for (const field of fields) {
         if(group[field] === undefined) {
             const message = `Missing field ${field}!`;
-            console.log(message);
             return next(message);
         }
     }

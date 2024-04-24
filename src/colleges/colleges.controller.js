@@ -33,7 +33,6 @@ function validateCollege(req, res, next){
     for (const field of fields) {
         if(college[field] === undefined) {
             const message = `Missing field ${field}!`;
-            console.log(message);
             return next(message);
         }
     }
@@ -46,7 +45,7 @@ async function postCollege(req, res){
     res.send(data[0]);
 }
 async function updateCollege(req, res){
-    await service.postCollege(res.locals.college);
+    const temp = await service.updateCollege(res.locals.college);
     res.send({message: "ok"});
 }
 

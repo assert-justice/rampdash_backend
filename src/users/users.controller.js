@@ -34,7 +34,6 @@ async function loginUser(req, res, next){
         if(!req.body[field]) return next(`Required field '${field}' not found!`);
     }
     const user = await service.loginUser(req.body.user_name, null);
-    console.log(user)
     if(!user) return next("Invalid login");
     res.send(user);
 }
@@ -44,16 +43,16 @@ function validateUser(req, res, next){
     const fields = [
         "user_name",
         "user_role",
-        "college_id",
+        // "college_id",
     ];
     for (const field of fields) {
         if(user[field] === undefined) {
             const message = `Missing field ${field}!`;
-            console.log(message);
             return next(message);
         }
     }
     res.locals.user = user;
+    if(user.user_role === "admin") return next();
     const college = collegesService.getCollege(user.college_id);
     if(!college) return next("no such college");
     res.locals.college = college;
@@ -69,7 +68,6 @@ function validateUser(req, res, next){
 
 async function postUser(req, res){
     const data = await service.postUser(res.locals.user);
-    // console.log(data[0]);
     res.send(data[0]);
 }
 

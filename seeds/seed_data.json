@@ -1,0 +1,50 @@
+{
+    "companies": [
+        {
+            "company_logo": "",
+            "company_name": "Slack",
+            "company_website": "company website",
+            "company_description": "company_description"
+        }
+    ],
+    "colleges": [
+        {
+            "college_name": "college of college",
+            "college_logo": "logo url"
+        },
+        {
+            "college_name": "temp3",
+            "college_logo": ""
+        }
+    ],
+    "groups": [
+        {
+            "group_name": "group name",
+            "college_id": null
+        }
+    ],
+    "offers": [
+        {
+            "offer_title": "offer title",
+            "offer_details": "here are some details",
+            "offer_link": "offer link",
+            "company_id": 1,
+            "college_id": null,
+            "group_id": null
+        },
+        {
+            "offer_title": "offer title 2",
+            "offer_details": "here are some details",
+            "offer_link": "offer link",
+            "company_id": 1,
+            "college_id": 1,
+            "group_id": null
+        }
+    ],
+    "users": [
+        {
+            "user_name": "riley",
+            "user_role": "admin"
+        }
+    ]
+}

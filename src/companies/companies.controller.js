@@ -39,7 +39,6 @@ function validateCompany(req, res, next){
 
 async function postCompany(req, res){
     const data = await service.postCompany(res.locals.company);
-    // console.log(data[0]);
     res.send(data[0]);
 }
 
