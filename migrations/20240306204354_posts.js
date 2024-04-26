@@ -28,7 +28,8 @@ exports.up = function(knex) {
     .createTable("offers", (table)=>{
         table.increments("offer_id").notNullable();
         table.string("offer_title").notNullable();
-        table.string("offer_details").notNullable();
+        // table.string("offer_details").notNullable();
+        table.text("offer_details").notNullable();
         table.string("offer_link").notNullable();
         table.integer("company_id").index()
         .references("company_id")

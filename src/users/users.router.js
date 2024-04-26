@@ -23,6 +23,6 @@ router.get("/:user_id", controller.getUser);
 router.post("/", controller.postUser);
 
 // post a new user
-router.post("/", controller.postUser);
+// router.post("/", controller.postUser);
 
 module.exports = router;

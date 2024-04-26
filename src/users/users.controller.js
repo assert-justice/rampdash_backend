@@ -53,16 +53,18 @@ function validateUser(req, res, next){
     }
     res.locals.user = user;
     if(user.user_role === "admin") return next();
-    const college = collegesService.getCollege(user.college_id);
+    console.log("here");
+    const college = collegeService.getCollege(user.college_id);
+    console.log(college);
     if(!college) return next("no such college");
     res.locals.college = college;
     if(user.group_id === undefined){
         return next();
     }
-    const group = groupService.getCollege(user.group_id);
-    if(!college) return next("no such group");
-    if(group.college_id !== user.college_id) return next("user college and group college do not match");
-    res.locals.group = group;
+    // const group = groupService.getCollege(user.group_id);
+    // if(!college) return next("no such group");
+    // if(group.college_id !== user.college_id) return next("user college and group college do not match");
+    // res.locals.group = group;
     next();
 }
 
