@@ -5,6 +5,13 @@ function listOffers(){
     .join("companies", "offers.company_id", "=", "companies.company_id")
     .select("*");
 }
+function listCollegeOffers(college_id){
+    return db("offers")
+    .where({college_id})
+    .orWhereNull("college_id")
+    .join("companies", "offers.company_id", "=", "companies.company_id")
+    .select("*");
+}
 
 function getOffer(offer_id){
     // return db("offers").where({offer_id}).join("companies", "offers.company_id", "=", "companies.company_id").select("*").first();
@@ -26,6 +33,7 @@ function deleteOffer(offer_id){
 
 module.exports = {
     listOffers,
+    listCollegeOffers,
     getOffer,
     postOffer,
     updateOffer,

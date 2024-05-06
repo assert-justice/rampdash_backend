@@ -2,10 +2,12 @@ const service = require("./offers.service");
 const companiesService = require("../companies/companies.service");
 const collegesService = require("../colleges/colleges.service");
 const groupsService = require("../groups/groups.service");
-const asyncErrorHandler = require("../async_error_handler");
 
 function listOffers(req, res, next){
-    service.listOffers().then(offers=>res.send(offers)).catch(next);
+    const {college_id} = req.query;
+    // console.log(college_id);
+    if(college_id === undefined)service.listOffers().then(offers=>res.send(offers)).catch(next);
+    else service.listCollegeOffers(college_id).then(offers=>res.send(offers)).catch(next);
 }
 
 function validateOfferId(req, res, next){
