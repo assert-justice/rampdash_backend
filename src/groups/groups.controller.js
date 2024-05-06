@@ -10,19 +10,20 @@ async function validateGroupId(req, res, next){
     const {group_id} = req.params;
     if(!group_id) return next("no group id provided");
     // check if id exists
-    const group = await service.getgroup(group_id);
+    const group = await service.getGroup(group_id);
     if(!group) return next("no such group");
     res.locals.group = group;
     next();
 }
 
-async function getGroup(req, res){
+function getGroup(req, res){
     res.send(res.locals.group);
 }
 
-async function deleteGroup(req, res){
-    await service.deleteGroup(res.locals.group.group_id);
-    res.send({message: "ok"});
+function deleteGroup(req, res, next){
+    service.deleteGroup(res.locals.group.group_id)
+        .then(()=>res.send({message: "ok"}))
+        .catch(next);
 }
 
 function validateGroup(req, res, next){
@@ -45,13 +46,15 @@ function validateGroup(req, res, next){
     next();
 }
 
-async function postGroup(req, res){
-    const data = await service.postGroup(res.locals.group);
-    res.send(data[0]);
+function postGroup(req, res, next){
+    service.postGroup(res.locals.group)
+        .then(data => res.send(data[0]))
+        .catch(next);
 }
-async function updateGroup(req, res){
-    await service.postGroup(res.locals.group);
-    res.send({message: "ok"});
+function updateGroup(req, res, next){
+    service.postGroup(res.locals.group)
+        .then(()=>res.send({message: "ok"}))
+        .catch(next);
 }
 
 module.exports = {

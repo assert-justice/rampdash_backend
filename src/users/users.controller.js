@@ -33,9 +33,10 @@ async function loginUser(req, res, next){
     for (const field of requiredFields) {
         if(!req.body[field]) return next(`Required field '${field}' not found!`);
     }
-    const user = await service.loginUser(req.body.user_name, null);
-    if(!user) return next("Invalid login");
-    res.send(user);
+    await service.loginUser(req.body.user_name, null).then(user => {
+        if(!user) return next("Invalid login");
+        res.send(user);
+    }).catch(next);
 }
 
 function validateUser(req, res, next){
@@ -53,9 +54,7 @@ function validateUser(req, res, next){
     }
     res.locals.user = user;
     if(user.user_role === "admin") return next();
-    console.log("here");
     const college = collegeService.getCollege(user.college_id);
-    console.log(college);
     if(!college) return next("no such college");
     res.locals.college = college;
     if(user.group_id === undefined){
@@ -68,9 +67,8 @@ function validateUser(req, res, next){
     next();
 }
 
-async function postUser(req, res){
-    const data = await service.postUser(res.locals.user);
-    res.send(data[0]);
+function postUser(req, res, next){
+    service.postUser(res.locals.user).then(data => res.send(data[0])).catch(next);
 }
 
 module.exports = {

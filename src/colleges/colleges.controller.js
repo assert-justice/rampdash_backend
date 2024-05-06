@@ -19,9 +19,10 @@ async function getCollege(req, res){
     res.send(res.locals.college);
 }
 
-async function deleteCollege(req, res){
-    await service.deleteCollege(res.locals.college.college_id);
-    res.send({message: "ok"});
+function deleteCollege(req, res, next){
+    service.deleteCollege(res.locals.college.college_id)
+        .then(()=>res.send({message: "ok"}))
+        .catch(next)
 }
 
 function validateCollege(req, res, next){
@@ -40,13 +41,15 @@ function validateCollege(req, res, next){
     next();
 }
 
-async function postCollege(req, res){
-    const data = await service.postCollege(res.locals.college);
-    res.send(data[0]);
+function postCollege(req, res, next){
+    service.postCollege(res.locals.college)
+        .then(data=>res.send(data[0]))
+        .catch(next);
 }
-async function updateCollege(req, res){
-    const temp = await service.updateCollege(res.locals.college);
-    res.send({message: "ok"});
+function updateCollege(req, res){
+    service.updateCollege(res.locals.college)
+        .then(()=>res.send({message: "ok"}))
+        .catch(next)
 }
 
 module.exports = {

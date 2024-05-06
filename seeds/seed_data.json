@@ -1,20 +1,30 @@
 {
     "companies": [
         {
-            "company_logo": "",
+            "company_logo": "https://www.voipone.ch/wp-content/uploads/2020/01/slack-logo-1024x1024.png",
             "company_name": "Slack",
-            "company_website": "company website",
-            "company_description": "company_description"
+            "company_website": "https://slack.com",
+            "company_description": "Slack is a cloud-based team communication platform developed by Slack Technologies, which has been owned by Salesforce since 2020. Slack has freemium and paid subscriptions. Slack's primary userbase is businesses, and has functionalities primarily for businesses."
+        },
+        {
+            "company_logo": "http://www.scriptgodsmustdie.com/wp-content/uploads/2014/04/kickstarter-logo-k-color.png",
+            "company_name": "Kickstarter",
+            "company_website": "https://www.kickstarter.com",
+            "company_description": "Kickstarter, PBC is an American public benefit corporation[2] based in Brooklyn, New York, that maintains a global crowdfunding platform focused on creativity.[3] The company's stated mission is to \"help bring creative projects to life\"."
         }
     ],
     "colleges": [
         {
-            "college_name": "college of college",
-            "college_logo": "logo url"
+            "college_name": "Brown",
+            "college_logo": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%3Fid%3DOIP.cCcFH-3oAipzAnhy-wCYCQHaIi%26pid%3DApi&f=1&ipt=ad01081f3aaf29ba2b021f2cb73627092008fbc89bcc3b5be942d1d3ef248aef&ipo=images"
         },
         {
-            "college_name": "temp3",
-            "college_logo": ""
+            "college_name": "Cornell",
+            "college_logo": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%3Fid%3DOIP.Uk41Cmx_g2XOat5U4PPqXgHaHa%26pid%3DApi&f=1&ipt=6ea2b5b6e1617b72402b738f99f0253740ba117fc5db90006b5ee6f3af0096c0&ipo=images"
+        },
+        {
+            "college_name": "Stanford",
+            "college_logo": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse3.mm.bing.net%2Fth%3Fid%3DOIP.eVp6TzyUSiCB1NATgDUCwgHaGk%26pid%3DApi&f=1&ipt=a4394403944ee13b52927f2265374ced2712ad4448123f8e73d161ef469fb18e&ipo=images"
         }
     ],
     "groups": [
@@ -25,19 +35,27 @@
     ],
     "offers": [
         {
-            "offer_title": "offer title",
+            "offer_title": "Web Engineer",
             "offer_details": "here are some details",
-            "offer_link": "offer link",
-            "company_id": 1,
+            "offer_link": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select",
+            "company_id": 2,
             "college_id": null,
             "group_id": null
         },
         {
-            "offer_title": "offer title 2",
+            "offer_title": "Internship Opportunity!",
             "offer_details": "here are some details",
-            "offer_link": "offer link",
+            "offer_link": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select",
             "company_id": 1,
             "college_id": 1,
+            "group_id": null
+        },
+        {
+            "offer_title": "Data Science Internship",
+            "offer_details": "come intern for us",
+            "offer_link": "http://localhost:3000/offers/new",
+            "company_id": 1,
+            "college_id": null,
             "group_id": null
         }
     ],
@@ -45,6 +63,11 @@
         {
             "user_name": "riley",
             "user_role": "admin"
+        },
+        {
+            "user_name": "bob",
+            "user_role": "student",
+            "college_id": 1
         }
     ]
 }

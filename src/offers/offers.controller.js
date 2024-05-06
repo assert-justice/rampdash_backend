@@ -2,20 +2,28 @@ const service = require("./offers.service");
 const companiesService = require("../companies/companies.service");
 const collegesService = require("../colleges/colleges.service");
 const groupsService = require("../groups/groups.service");
+const asyncErrorHandler = require("../async_error_handler");
 
-async function listOffers(req, res){
-    let offers = await service.listOffers();
-    res.send(offers);
+function listOffers(req, res, next){
+    service.listOffers().then(offers=>res.send(offers)).catch(next);
 }
 
-async function validateOfferId(req, res, next){
+function validateOfferId(req, res, next){
     const {offer_id} = req.params;
     if(!offer_id) return next("no offer id provided");
     // check if id exists
-    const offer = await service.getOffer(offer_id);
-    if(!offer) return next("no such offer");
-    res.locals.offer = offer;
-    next();
+    service.getOffer(offer_id).then(offer => {
+        if(!offer) return next("no such offer");
+        res.locals.offer = offer;
+        next();
+    }).catch(next);
+    // try{
+    //     const offer = await service.getOffer(offer_id);
+    //     if(!offer) return next("no such offer");
+    //     res.locals.offer = offer;
+    //     next();    
+    // }
+    // catch(e){next(e);}
 }
 
 async function getOffer(req, res){
@@ -38,9 +46,9 @@ async function getOffer(req, res){
     res.send(res.locals.offer);
 }
 
-async function deleteOffer(req, res){
-    await service.deleteOffer(res.locals.offer.offer_id);
-    res.send({message: "ok"});
+async function deleteOffer(req, res, next){
+    service.deleteOffer(res.locals.offer.offer_id).then(()=>res.send({message: "ok"}))
+        .catch(next);
 }
 
 function validateOffer(req, res, next){
@@ -82,17 +90,15 @@ async function postOffer(req, res){
     delete offer.college;
     delete offer.company;
     delete offer.group;
-    const data = await service.postOffer(offer);
-    res.send(data[0]);
+    service.postOffer(offer).then(data => res.send(data)).catch(next);
 }
-async function updateOffer(req, res){
+async function updateOffer(req, res, next){
     const {offer} = res.locals;
     delete offer.college;
     delete offer.company;
     delete offer.group;
     if(offer.college_id) offer.college_id = +offer.college_id;
-    await service.updateOffer(offer);
-    res.send({message: "ok"});
+    await service.updateOffer(offer).then(()=>res.send({message: "ok"})).catch(next);
 }
 
 module.exports = {

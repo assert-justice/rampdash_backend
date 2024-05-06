@@ -37,18 +37,20 @@ function validateCompany(req, res, next){
     next();
 }
 
-async function postCompany(req, res){
-    const data = await service.postCompany(res.locals.company);
+function postCompany(req, res){
+    service.postCompany(res.locals.company);
     res.send(data[0]);
 }
 
-async function deleteCompany(req, res){
-    await service.deleteCompany(res.locals.company.company_id);
-    res.send({message: "ok"});
+function deleteCompany(req, res, next){
+    service.deleteCompany(res.locals.company.company_id)
+        .then(()=>res.send({message: "ok"}))
+        .catch(next);
 }
-async function updateCompany(req, res){
-    await service.updateCompany(res.locals.company);
-    res.send({message: "ok"});
+function updateCompany(req, res, next){
+    service.updateCompany(res.locals.company)
+        .then(()=>res.send({message: "ok"}))
+        .catch(next);
 }
 
 module.exports = {

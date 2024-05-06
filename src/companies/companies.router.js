@@ -16,6 +16,6 @@ router.get("/:company_id", controller.getCompany);
 router.post("/", controller.postCompany);
 // delete a company
 router.delete("/:company_id", controller.deleteCompany);
-router.patch("/:company_id", controller.updateCompany);
+router.patch("/", controller.updateCompany);
 
 module.exports = router;

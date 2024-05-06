@@ -11,7 +11,7 @@ router.get("/:group_id", controller.getGroup);
 // post a new group
 router.post("/", controller.postGroup);
 // update an group
-router.patch("/:group_id", controller.updateGroup);
+router.patch("/", controller.updateGroup);
 // delete an group
 router.delete("/:group_id", controller.deleteGroup);
 

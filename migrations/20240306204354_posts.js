@@ -9,7 +9,7 @@ exports.up = function(knex) {
         table.string("company_logo").notNullable();
         table.string("company_name").notNullable();
         table.string("company_website").notNullable();
-        table.string("company_description").notNullable();
+        table.text("company_description").notNullable();
     })
     .createTable("colleges", (table)=>{
         table.increments("college_id").notNullable();
