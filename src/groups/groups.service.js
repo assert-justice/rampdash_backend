@@ -1,8 +1,12 @@
 const db = require("../db");
 
 function listGroups(){
+    return db("groups").select("*");
+}
+
+function listCollegeGroups(college_id){
     return db("groups")
-    .join("companies", "groups.company_id", "=", "companies.company_id")
+    .where({college_id}).orWhereNull("college_id")
     .select("*");
 }
 
@@ -24,6 +28,7 @@ function deleteGroup(group_id){
 
 module.exports = {
     listGroups,
+    listCollegeGroups,
     getGroup,
     postGroup,
     updateGroup,

@@ -1,9 +1,15 @@
 const service = require("./users.service");
 const collegeService = require("../colleges/colleges.service");
 const groupService = require("../groups/groups.service");
+const bcrypt = require("bcrypt");
+// const cookieParser = require("cookie-parser");
 
 async function listUsers(req, res){
     const users = await service.listUsers();
+    // TODO: remove the hashed passwords for pete's sake
+    for (const user of users) {
+        // delete user.user_pwd;
+    }
     res.send(users);
 }
 
@@ -21,21 +27,26 @@ function getUser(req, res){
     res.send(res.locals.user);
 }
 
-function hashPassword(req, res, next){
-    next();
-    // if(!req.body.password){
-    //     return
-    // }
-}
-
-async function loginUser(req, res, next){
-    const requiredFields = ["user_name"];
+function loginUser(req, res, next){
+    const requiredFields = ["user_name", "user_pwd"];
     for (const field of requiredFields) {
         if(!req.body[field]) return next(`Required field '${field}' not found!`);
     }
-    await service.loginUser(req.body.user_name, null).then(user => {
-        if(!user) return next("Invalid login");
-        res.send(user);
+    service.loginUser(req.body.user_name).then(user => {
+        console.log(user);
+        if(!user) {
+            return next("Invalid user name");
+        }
+        if(bcrypt.compareSync(req.body.user_pwd, user.user_pwd)){
+            // create token
+            res.cookie("user", user.user_role, {signed: true});
+            delete user.user_pwd;
+            res.send(user);
+        }
+        else{
+            console.log("here");
+            next("Invalid password!");
+        }
     }).catch(next);
 }
 
@@ -44,7 +55,7 @@ function validateUser(req, res, next){
     const fields = [
         "user_name",
         "user_role",
-        // "college_id",
+        "user_email",
     ];
     for (const field of fields) {
         if(user[field] === undefined) {
@@ -52,12 +63,14 @@ function validateUser(req, res, next){
             return next(message);
         }
     }
+    const {user_role, college_id, group_id} = user;
     res.locals.user = user;
-    if(user.user_role === "admin") return next();
-    const college = collegeService.getCollege(user.college_id);
-    if(!college) return next("no such college");
+    if(user_role === "admin") return next();
+    if(!college_id) return next("No college id provided!");
+    const college = collegeService.getCollege(college_id);
+    if(!college) return next("No such college!");
     res.locals.college = college;
-    if(user.group_id === undefined){
+    if(group_id === undefined){
         return next();
     }
     // const group = groupService.getCollege(user.group_id);
@@ -68,12 +81,49 @@ function validateUser(req, res, next){
 }
 
 function postUser(req, res, next){
+    res.locals.user.user_activated = false;
     service.postUser(res.locals.user).then(data => res.send(data[0])).catch(next);
+}
+async function activateUser(req, res, next){
+    const {user_id, user_pwd, /*user_email, user_name*/} = req.body;
+    console.log({user_id, user_pwd});
+    if(!user_id) return next("Missing user id!");
+    const user = await service.getUser(user_id);
+    if(!user) return next("Invalid user id!");
+    if(user.user_activated) return next("User has already been activated!");
+    if(!user_pwd) return next("User password is required");
+    // set active
+    user.user_activated = true;
+    const saltRounds = 10;
+    bcrypt.hash(user_pwd, saltRounds).then(hash => {
+        user.user_pwd = hash;
+        service.updateUser(user)
+            .then(()=>res.send({message: "ok"}))
+            .catch(e=>{
+                console.log(e);
+                next(e);
+            });
+    });
+}
+
+function updateUser(_, res, next){
+    service.updateUser(res.locals.user)
+        .then(res.send({message: "ok"}))
+        .catch(e => next(e));
+}
+
+function deleteUser(_, res, next){
+    service.deleteUser(res.locals.user.user_id)
+        .then(()=>res.send({message: "ok"}))
+        .catch(next);
 }
 
 module.exports = {
     listUsers,
     getUser: [validateUserId, getUser],
-    loginUser: [hashPassword, loginUser],
+    loginUser,
     postUser: [validateUser, postUser],
+    updateUser: [validateUser, updateUser],
+    activateUser,
+    deleteUser: [validateUserId, deleteUser],
 };

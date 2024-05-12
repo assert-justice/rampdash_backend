@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const app = express();
 const companies = require("./companies/companies.router");
 const offers = require("./offers/offers.router");
@@ -8,6 +9,7 @@ const colleges = require("./colleges/colleges.router");
 
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser(process.env.SECRET));
 
 // app.use("/posts", posts);
 app.use("/companies", companies);

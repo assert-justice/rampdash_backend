@@ -2,8 +2,9 @@ const service = require("./groups.service");
 const collegesService = require("../colleges/colleges.service");
 
 async function listGroups(req, res){
-    let groups = await service.listgroups();
-    res.send(groups);
+    const {college_id} = req.query;
+    if(college_id === undefined) service.listGroups().then(res.send(groups));
+    else service.listCollegeGroups(college_id).then(res.send(groups));
 }
 
 async function validateGroupId(req, res, next){

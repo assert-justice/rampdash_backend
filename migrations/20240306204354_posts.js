@@ -51,7 +51,10 @@ exports.up = function(knex) {
     .createTable("users", (table)=>{
         table.increments("user_id").notNullable();
         table.string("user_name").notNullable();
+        table.string("user_email").notNullable();
         table.string("user_role").notNullable();
+        table.boolean("user_activated").notNullable();
+        table.string("user_pwd");
         table.integer("group_id").index()
         .references("group_id")
         .inTable("groups")
