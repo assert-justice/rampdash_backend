@@ -6,16 +6,17 @@ const companies = require("./companies/companies.router");
 const offers = require("./offers/offers.router");
 const users = require("./users/users.router");
 const colleges = require("./colleges/colleges.router");
+const groups = require("./groups/groups.router");
 
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser(process.env.SECRET));
 
-// app.use("/posts", posts);
 app.use("/companies", companies);
 app.use("/offers", offers);
 app.use("/users", users);
 app.use("/colleges", colleges);
+app.use("/groups", groups);
 
 app.get("/", (req, res) => {
     res.send('Hello World!')

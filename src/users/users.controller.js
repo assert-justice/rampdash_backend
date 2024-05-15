@@ -33,7 +33,6 @@ function loginUser(req, res, next){
         if(!req.body[field]) return next(`Required field '${field}' not found!`);
     }
     service.loginUser(req.body.user_name).then(user => {
-        console.log(user);
         if(!user) {
             return next("Invalid user name");
         }
@@ -44,7 +43,6 @@ function loginUser(req, res, next){
             res.send(user);
         }
         else{
-            console.log("here");
             next("Invalid password!");
         }
     }).catch(next);
@@ -52,6 +50,7 @@ function loginUser(req, res, next){
 
 function validateUser(req, res, next){
     const user = req.body;
+    console.log(user);
     const fields = [
         "user_name",
         "user_role",
@@ -63,6 +62,8 @@ function validateUser(req, res, next){
             return next(message);
         }
     }
+    // just to be certain. updating passwords is separate
+    delete user.user_pwd;
     const {user_role, college_id, group_id} = user;
     res.locals.user = user;
     if(user_role === "admin") return next();
@@ -80,13 +81,35 @@ function validateUser(req, res, next){
     next();
 }
 
+async function updatePassword(req, res, next){
+    // get account, make sure it's activated
+    // hash that sucker
+    const user = res.locals.user;
+    const {user_id, user_pwd, /*user_email, user_name*/} = user;
+    // if(!user_id) return next("Missing user id!");
+    // const user = await service.getUser(user_id);
+    // if(!user) return next("Invalid user id!");
+    // if(user.user_activated) return next("User has already been activated!");
+    if(!user_pwd) return next("User password is required");
+    // set active
+    // user.user_activated = true;
+    const saltRounds = 10;
+    bcrypt.hash(user_pwd, saltRounds).then(hash => {
+        user.user_pwd = hash;
+        service.updateUser(user)
+            .then(()=>res.send({message: "ok"}))
+            .catch(e=>{
+                next(e);
+            });
+    });
+}
+
 function postUser(req, res, next){
     res.locals.user.user_activated = false;
     service.postUser(res.locals.user).then(data => res.send(data[0])).catch(next);
 }
 async function activateUser(req, res, next){
     const {user_id, user_pwd, /*user_email, user_name*/} = req.body;
-    console.log({user_id, user_pwd});
     if(!user_id) return next("Missing user id!");
     const user = await service.getUser(user_id);
     if(!user) return next("Invalid user id!");
@@ -100,13 +123,13 @@ async function activateUser(req, res, next){
         service.updateUser(user)
             .then(()=>res.send({message: "ok"}))
             .catch(e=>{
-                console.log(e);
                 next(e);
             });
     });
 }
 
 function updateUser(_, res, next){
+    console.log(res.locals.user);
     service.updateUser(res.locals.user)
         .then(res.send({message: "ok"}))
         .catch(e => next(e));
@@ -121,6 +144,7 @@ function deleteUser(_, res, next){
 module.exports = {
     listUsers,
     getUser: [validateUserId, getUser],
+    updatePassword: [validateUserId, updatePassword],
     loginUser,
     postUser: [validateUser, postUser],
     updateUser: [validateUser, updateUser],

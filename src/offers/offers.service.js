@@ -22,7 +22,6 @@ function postOffer(offer){
     return db("offers").insert(offer, "*");
 }
 function updateOffer(offer){
-    console.log(offer);
     const {offer_id} = offer;
     return db("offers").where({offer_id}).update(offer);
 }

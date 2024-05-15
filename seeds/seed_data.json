@@ -30,7 +30,7 @@
     "groups": [
         {
             "group_name": "group name",
-            "college_id": null
+            "college_id": 1
         }
     ],
     "offers": [

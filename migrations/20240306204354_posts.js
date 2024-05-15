@@ -23,7 +23,7 @@ exports.up = function(knex) {
         .references("college_id")
         .inTable("colleges")
         .onUpdate("CASCADE")
-        .onDelete("CASCADE");
+        .onDelete("CASCADE").notNullable();
     })
     .createTable("offers", (table)=>{
         table.increments("offer_id").notNullable();

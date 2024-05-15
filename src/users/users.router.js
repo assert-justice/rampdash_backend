@@ -20,7 +20,9 @@ router.post("/", controller.postUser);
 router.post("/activate", controller.activateUser);
 
 // update a user
-router.patch("/update", controller.updateUser);
+router.patch("/", controller.updateUser);
+// update a password
+router.patch("/:user_id", controller.updatePassword);
 
 // delete a user
 router.delete("/:user_id", controller.deleteUser);

@@ -3,8 +3,8 @@ const collegesService = require("../colleges/colleges.service");
 
 async function listGroups(req, res){
     const {college_id} = req.query;
-    if(college_id === undefined) service.listGroups().then(res.send(groups));
-    else service.listCollegeGroups(college_id).then(res.send(groups));
+    if(college_id === undefined) service.listGroups().then(groups => res.send(groups));
+    else service.listCollegeGroups(college_id).then(groups => res.send(groups));
 }
 
 async function validateGroupId(req, res, next){
@@ -30,7 +30,7 @@ function deleteGroup(req, res, next){
 function validateGroup(req, res, next){
     const group = req.body;
     const fields = [
-        "group_title",
+        "group_name",
         "college_id",
     ];
     for (const field of fields) {
@@ -39,12 +39,20 @@ function validateGroup(req, res, next){
             return next(message);
         }
     }
+    collegesService.getCollege(group.college_id).then(college => {
+        if(!college) return next("no such college");
+        res.locals.group = group;
+        res.locals.college = college;
+        next();
+    })
+    .catch(e => next(e))
     // check college id exists
-    const college = collegesService.getCollege(group.college_id);
-    if(!college) return next("no such college");
-    res.locals.group = group;
-    res.locals.college = college;
-    next();
+    // const college = collegesService.getCollege(group.college_id);
+    // console.log(college);
+    // if(!college) return next("no such college");
+    // res.locals.group = group;
+    // res.locals.college = college;
+    // next();
 }
 
 function postGroup(req, res, next){
@@ -53,8 +61,10 @@ function postGroup(req, res, next){
         .catch(next);
 }
 function updateGroup(req, res, next){
-    service.postGroup(res.locals.group)
-        .then(()=>res.send({message: "ok"}))
+    service.updateGroup(res.locals.group)
+        .then(()=>{
+            res.send({message: "ok"})
+        })
         .catch(next);
 }
 
