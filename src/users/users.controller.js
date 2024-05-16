@@ -32,11 +32,12 @@ function loginUser(req, res, next){
     for (const field of requiredFields) {
         if(!req.body[field]) return next(`Required field '${field}' not found!`);
     }
-    service.loginUser(req.body.user_name).then(user => {
+    const {user_name, user_pwd} = req.body;
+    service.loginUser(user_name).then(user => {
         if(!user) {
             return next("Invalid user name");
         }
-        if(bcrypt.compareSync(req.body.user_pwd, user.user_pwd)){
+        if(bcrypt.compareSync(user_pwd, user.user_pwd)){
             // create token
             res.cookie("user", user.user_role, {signed: true});
             delete user.user_pwd;
