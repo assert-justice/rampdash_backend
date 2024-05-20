@@ -27,7 +27,7 @@ function updateOffer(offer){
 }
 
 function deleteOffer(offer_id){
-    db("offers").where({offer_id}).delete();
+    return db("offers").where({offer_id}).delete();
 }
 
 module.exports = {
