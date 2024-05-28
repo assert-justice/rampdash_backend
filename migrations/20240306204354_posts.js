@@ -66,6 +66,23 @@ exports.up = function(knex) {
         .onUpdate("CASCADE")
         .onDelete("CASCADE");
     })
+    .createTable("invites", (table)=>{
+        table.increments("invite_id").notNullable();
+        table.string("invite_status").notNullable();
+        table.string("user_name").notNullable();
+        table.string("user_email").notNullable();
+        table.string("user_role").notNullable();
+        table.integer("group_id").index()
+        .references("group_id")
+        .inTable("groups")
+        .onUpdate("CASCADE")
+        .onDelete("CASCADE");
+        table.integer("college_id").index()
+        .references("college_id")
+        .inTable("colleges")
+        .onUpdate("CASCADE")
+        .onDelete("CASCADE");
+    })
 };
 
 /**
@@ -74,6 +91,7 @@ exports.up = function(knex) {
  */
 exports.down = function(knex) {
     return knex.schema
+    .dropTable("invites")
     .dropTable("users")
     .dropTable("offers")
     .dropTable("groups")

@@ -2,25 +2,32 @@
 
 ## Routes
 
-- Clients
-- Posts
-- Orgs
-- Users
-- Messages
+### Colleges
 
-## ToDos
+- list, get: public
+- post, edit, delete: admin
 
-### Short term
+### Companies
 
-- Set up elephant sql
-- Write and migrate schemas for posts and orgs
-- Create router, controller, service for posts and orgs
-- Hook into front end
+- list, get: public
+- post, edit, delete: admin
 
-### Longer term
+### Groups
 
-- Migrate the rest of the tables
-- Set up the rest of the routes
-- Integrate google api, auth, etc
-- Protect endpoints and db
-- Deploy
+- list, get: public
+- post, edit, delete: admin
+
+### Offers
+
+- list, get: logged in, filtered
+- post, edit, delete: admin
+
+### Users
+
+- list, delete: admin
+- get, edit: admin, self
+- post: valid invite
+
+### Invites
+
+all: admin
