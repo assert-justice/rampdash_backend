@@ -18,7 +18,7 @@ function updateCollege(college){
 }
 
 function deleteCollege(college_id){
-    db("colleges").where({college_id}).delete();
+    return db("colleges").where({college_id}).delete();
 }
 
 module.exports = {

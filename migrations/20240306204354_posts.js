@@ -6,7 +6,7 @@ exports.up = function(knex) {
     return knex.schema
     .createTable("companies", (table)=>{
         table.increments("company_id").notNullable();
-        table.string("company_logo").notNullable();
+        table.text("company_logo").notNullable();
         table.string("company_name").notNullable();
         table.string("company_website").notNullable();
         table.text("company_description").notNullable();
@@ -14,7 +14,7 @@ exports.up = function(knex) {
     .createTable("colleges", (table)=>{
         table.increments("college_id").notNullable();
         table.string("college_name").notNullable();
-        table.string("college_logo").notNullable();
+        table.text("college_logo").notNullable();
     })
     .createTable("groups", (table)=>{
         table.increments("group_id").notNullable();
@@ -53,7 +53,7 @@ exports.up = function(knex) {
         table.string("user_name").notNullable();
         table.string("user_email").notNullable();
         table.string("user_role").notNullable();
-        table.boolean("user_activated").notNullable();
+        // table.boolean("user_activated").notNullable();
         table.string("user_pwd");
         table.integer("group_id").index()
         .references("group_id")
@@ -69,8 +69,9 @@ exports.up = function(knex) {
     .createTable("invites", (table)=>{
         table.increments("invite_id").notNullable();
         table.string("invite_status").notNullable();
-        table.string("user_name").notNullable();
-        table.string("user_email").notNullable();
+        table.string("invite_code").unique().notNullable();
+        // table.string("user_name").notNullable();
+        // table.string("user_email").notNullable();
         table.string("user_role").notNullable();
         table.integer("group_id").index()
         .references("group_id")

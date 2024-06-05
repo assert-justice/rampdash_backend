@@ -88,13 +88,11 @@ function validateOffer(req, res, next){
 
 async function postOffer(req, res, next){
     const {offer} = res.locals;
-    console.log(offer);
     delete offer.college;
     delete offer.company;
     delete offer.group;
     service.postOffer(offer).then(data => res.send(data))
         .catch(err => {
-            console.log(err);
             next(err);
         });
 }
@@ -103,7 +101,6 @@ async function updateOffer(req, res, next){
     delete offer.college;
     delete offer.company;
     delete offer.group;
-    console.log(offer);
     if(offer.college_id) offer.college_id = +offer.college_id;
     await service.updateOffer(offer).then(()=>res.send({message: "ok"})).catch(next);
 }

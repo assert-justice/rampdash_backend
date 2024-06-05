@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const controller = require("./groups.controller");
+const { isAdmin } = require("../auth_middleware");
 
 // get all groups, potentially filtered by criteria
 router.get("/", controller.listGroups);
@@ -9,10 +10,10 @@ router.get("/", controller.listGroups);
 router.get("/:group_id", controller.getGroup);
 
 // post a new group
-router.post("/", controller.postGroup);
+router.post("/", isAdmin, controller.postGroup);
 // update an group
-router.patch("/", controller.updateGroup);
+router.patch("/", isAdmin, controller.updateGroup);
 // delete an group
-router.delete("/:group_id", controller.deleteGroup);
+router.delete("/:group_id", isAdmin, controller.deleteGroup);
 
 module.exports = router;

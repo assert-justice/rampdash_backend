@@ -2,6 +2,7 @@ const service = require("./users.service");
 const collegeService = require("../colleges/colleges.service");
 const groupService = require("../groups/groups.service");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 // const cookieParser = require("cookie-parser");
 
 async function listUsers(req, res){
@@ -24,7 +25,7 @@ async function validateUserId(req, res, next){
 }
 
 function getUser(req, res){
-    res.send(res.locals.user);
+    res.send({user: res.locals.user});
 }
 
 function loginUser(req, res, next){
@@ -39,9 +40,12 @@ function loginUser(req, res, next){
         }
         if(bcrypt.compareSync(user_pwd, user.user_pwd)){
             // create token
-            res.cookie("user", user.user_role, {signed: true});
-            delete user.user_pwd;
-            res.send(user);
+            const token = jwt.sign({ userId: user.user_id }, process.env.SECRET, { expiresIn: '1h' });
+            // console.log(user);
+            res.send({user, token});
+            // res.cookie("user", user.user_role, {signed: true});
+            // delete user.user_pwd;
+            // res.send(user);
         }
         else{
             next("Invalid password!");
@@ -50,8 +54,8 @@ function loginUser(req, res, next){
 }
 
 function validateUser(req, res, next){
-    const user = req.body;
-    console.log(user);
+    const user = req.body.user;
+    if(!user) return next("No user supplied");
     const fields = [
         "user_name",
         "user_role",
@@ -106,8 +110,8 @@ async function updatePassword(req, res, next){
 }
 
 function postUser(req, res, next){
-    res.locals.user.user_activated = false;
-    service.postUser(res.locals.user).then(data => res.send(data[0])).catch(next);
+    // res.locals.user.user_activated = false;
+    service.postUser(res.locals.user).then(data => res.send({user: data[0]})).catch(next);
 }
 async function activateUser(req, res, next){
     const {user_id, user_pwd, /*user_email, user_name*/} = req.body;
@@ -129,8 +133,17 @@ async function activateUser(req, res, next){
     });
 }
 
-function updateUser(_, res, next){
-    console.log(res.locals.user);
+function updateUser(req, res, next){
+    const {user} = req.body;
+    if(!user) return next("No user object supplied");
+    const fields = [
+        "user_name",
+        "user_email",
+    ];
+    if(res.locals.current_user.user_role === "admin") fields.push("user_role");
+    for (const field of fields) {
+        if(user[field] !== undefined) res.locals.user[field] = user[field];
+    }
     service.updateUser(res.locals.user)
         .then(res.send({message: "ok"}))
         .catch(e => next(e));
@@ -148,7 +161,7 @@ module.exports = {
     updatePassword: [validateUserId, updatePassword],
     loginUser,
     postUser: [validateUser, postUser],
-    updateUser: [validateUser, updateUser],
+    updateUser: [validateUserId, updateUser],
     activateUser,
     deleteUser: [validateUserId, deleteUser],
 };

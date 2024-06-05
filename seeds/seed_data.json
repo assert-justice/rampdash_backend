@@ -64,16 +64,28 @@
             "user_name": "riley",
             "user_role": "admin",
             "user_email": "waskerdu@gmail.com",
-            "user_pwd": "$2b$10$MYUUUn2orKbY909T2524k.WyZzqbqSyoEBzR2Bcgz8XGzJItHXdHe",
-            "user_activated": true
+            "user_pwd": "$2b$10$MYUUUn2orKbY909T2524k.WyZzqbqSyoEBzR2Bcgz8XGzJItHXdHe"
         },
         {
             "user_name": "sally",
             "user_role": "student",
             "user_email": "sally_sparrow@hotmail.com",
             "user_pwd": "$2b$10$yJw1MwbkmMIj9vSeIjCjpu9epgGLO0HP4Jj9O8CdPTj2PAf.8lnWO",
+            "college_id": 1
+        }
+    ],
+    "invites":[
+        {
+            "invite_status": "pending",
+            "invite_code": "admin inv code",
+            "user_role": "admin"
+        },
+        {
+            "invite_status": "pending",
+            "invite_code": "student inv code",
+            "user_role": "student",
             "college_id": 1,
-            "user_activated": true
+            "group_id": 1
         }
     ]
 }
