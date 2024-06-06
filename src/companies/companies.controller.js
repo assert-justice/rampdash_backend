@@ -1,4 +1,5 @@
 const service = require("./companies.service");
+const { body, validationResult } = require('express-validator');
 
 async function listCompanies(req, res){
     const companies = await service.listCompanies();
@@ -16,20 +17,22 @@ async function validateCompanyId(req, res, next){
 }
 
 function getCompany(req, res){
-    res.send(res.locals.company);
+    res.send({company: res.locals.company});
 }
 
-function validateCompany(req, res, next){
-    const company = req.body;
-    const fields = [
-        "company_name",
-        "company_logo",
-        "company_website",
-        "company_description",
+async function validateCompany(req, res, next){
+    const {company} = req.body;
+    const validators = [
+        body("company.company_name").isString().notEmpty().escape(),
+        body("company.company_description").isString().escape(),
+        body("company.company_logo").isURL().notEmpty().escape(),
+        body("company.company_website").isURL().notEmpty().escape(),
     ];
-    for (const field of fields) {
-        if(company[field] === undefined) {
-            const message = `Missing field ${field}!`;
+    for (const val of validators) {
+        const result = await val.run(req);
+        if(!result.isEmpty()){
+            const err = result.array()[0];
+            const message = `${err.msg} '${err.value}' at path ${err.path}`;
             return next(message);
         }
     }
@@ -37,9 +40,10 @@ function validateCompany(req, res, next){
     next();
 }
 
-function postCompany(req, res){
-    service.postCompany(res.locals.company);
-    res.send(data[0]);
+function postCompany(req, res, next){
+    service.postCompany(res.locals.company)
+    .then(data => res.send({company: data[0]}))
+    .catch(next);
 }
 
 function deleteCompany(req, res, next){
@@ -47,7 +51,19 @@ function deleteCompany(req, res, next){
         .then(()=>res.send({message: "ok"}))
         .catch(next);
 }
+
 function updateCompany(req, res, next){
+    const {company} = req.body;
+    if(!company) return next("No company in body");
+    const fields = [
+        "company_name",
+        "company_logo",
+        "company_description",
+        "company_website",
+    ];
+    for (const field of fields) {
+        if(company[field] !== undefined) res.locals.company[field] = company[field];
+    }
     service.updateCompany(res.locals.company)
         .then(()=>res.send({message: "ok"}))
         .catch(next);
@@ -57,6 +73,6 @@ module.exports = {
     listCompanies,
     getCompany: [validateCompanyId, getCompany],
     postCompany: [validateCompany, postCompany],
-    updateCompany: [validateCompany, updateCompany],
+    updateCompany: [validateCompanyId, updateCompany],
     deleteCompany: [validateCompanyId, deleteCompany],
 };

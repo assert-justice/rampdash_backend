@@ -61,12 +61,9 @@ function updateCollege(req, res, next){
         "college_name",
         "college_logo",
     ];
-    // console.log(college);
-    // console.log(res.locals.college);
     for (const field of fields) {
         if(college[field] !== undefined) res.locals.college[field] = college[field];
     }
-    // console.log(res.locals.college);
     service.updateCollege(res.locals.college)
         .then(()=>res.send({message: "ok"}))
         .catch(next)
