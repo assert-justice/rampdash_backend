@@ -1,5 +1,6 @@
 const service = require("./groups.service");
 const collegesService = require("../colleges/colleges.service");
+const { body, validationResult } = require('express-validator');
 
 async function listGroups(req, res){
     const {college_id} = req.query;
@@ -18,7 +19,7 @@ async function validateGroupId(req, res, next){
 }
 
 function getGroup(req, res){
-    res.send(res.locals.group);
+    res.send({group: res.locals.group});
 }
 
 function deleteGroup(req, res, next){
@@ -27,18 +28,32 @@ function deleteGroup(req, res, next){
         .catch(next);
 }
 
-function validateGroup(req, res, next){
-    const group = req.body;
-    const fields = [
-        "group_name",
-        "college_id",
+async function validateGroup(req, res, next){
+    const {group} = req.body;
+    if(!group) return next("No group provided");
+    const validators = [
+        body("group.group_name").isString().notEmpty().escape(),
+        body("group.college_id").isNumeric(),
     ];
-    for (const field of fields) {
-        if(group[field] === undefined) {
-            const message = `Missing field ${field}!`;
+    for (const val of validators) {
+        const result = await val.run(req);
+        if(!result.isEmpty()){
+            const err = result.array()[0];
+            const message = `${err.msg} '${err.value}' at path ${err.path}`;
             return next(message);
         }
     }
+    // const group = req.body;
+    // const fields = [
+    //     "group_name",
+    //     "college_id",
+    // ];
+    // for (const field of fields) {
+    //     if(group[field] === undefined) {
+    //         const message = `Missing field ${field}!`;
+    //         return next(message);
+    //     }
+    // }
     collegesService.getCollege(group.college_id).then(college => {
         if(!college) return next("no such college");
         res.locals.group = group;
@@ -57,10 +72,18 @@ function validateGroup(req, res, next){
 
 function postGroup(req, res, next){
     service.postGroup(res.locals.group)
-        .then(data => res.send(data[0]))
+        .then(data => res.send({group: data[0]}))
         .catch(next);
 }
 function updateGroup(req, res, next){
+    const {group} = req.body;
+    const fields = [
+        "group_name",
+        "college_id",
+    ];
+    for (const field of fields) {
+        if(group[field] !== undefined) res.locals.group[field] = group[field];
+    }
     service.updateGroup(res.locals.group)
         .then(()=>{
             res.send({message: "ok"})
@@ -73,5 +96,5 @@ module.exports = {
     getGroup: [validateGroupId, getGroup],
     deleteGroup: [validateGroupId, deleteGroup],
     postGroup: [validateGroup, postGroup],
-    updateGroup: [validateGroup, updateGroup],
+    updateGroup: [validateGroupId, updateGroup],
 };
