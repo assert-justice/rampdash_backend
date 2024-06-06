@@ -2,6 +2,7 @@ const service = require("./offers.service");
 const companiesService = require("../companies/companies.service");
 const collegesService = require("../colleges/colleges.service");
 const groupsService = require("../groups/groups.service");
+const { body, validationResult } = require('express-validator');
 
 function listOffers(req, res, next){
     const {college_id} = req.query;
@@ -18,13 +19,6 @@ function validateOfferId(req, res, next){
         res.locals.offer = offer;
         next();
     }).catch(next);
-    // try{
-    //     const offer = await service.getOffer(offer_id);
-    //     if(!offer) return next("no such offer");
-    //     res.locals.offer = offer;
-    //     next();    
-    // }
-    // catch(e){next(e);}
 }
 
 async function getOffer(req, res){
@@ -44,7 +38,7 @@ async function getOffer(req, res){
         if(!group) return next("Invalid group id");
         res.locals.offer.group = group;
     }
-    res.send(res.locals.offer);
+    res.send({offer: res.locals.offer});
 }
 
 async function deleteOffer(req, res, next){
@@ -52,57 +46,75 @@ async function deleteOffer(req, res, next){
         .catch(next);
 }
 
-function validateOffer(req, res, next){
-    const offer = req.body;
-    const fields = [
-        "offer_title",
-        "offer_details",
-        "offer_link",
-        // company_id, group_id, and college_id are optional but must be valid if present
+async function validateOffer(req, res, next){
+    const {offer} = req.body;
+    if(!offer) return next("No offer provided");
+    const validators = [
+        body("offer.offer_title").isString().notEmpty().escape(),
+        body("offer.offer_details").isString().escape(),
+        body("offer.offer_link").isURL().notEmpty().escape(),
+        body("offer.company_id").isNumeric(),
+        body("offer.college_id").isNumeric().optional(),
+        body("offer.group_id").isNumeric().optional(),
     ];
-    for (const field of fields) {
-        if(offer[field] === undefined) {
-            const message = `Missing field ${field}!`;
+    for (const val of validators) {
+        const result = await val.run(req);
+        if(!result.isEmpty()){
+            const err = result.array()[0];
+            const message = `${err.msg} '${err.value}' at path ${err.path}`;
             return next(message);
         }
     }
     res.locals.offer = offer;
     // check id exists
-    if(offer.company_id){
-        const company = companiesService.getCompany(offer.company_id);
-        if(!company) return next("Invalid company id");
-        res.locals.offer.company = company;
-    }
+    const company = companiesService.getCompany(offer.company_id);
+    if(!company) return next("Invalid company id");
+    // res.locals.offer.company = company;
     if(offer.college_id){
         const college = collegesService.getCollege(offer.college_id);
-        if(!college) return 
-        "offer_types",lege = college;
+        if(!college) return next("Invalid college id");
+        // res.locals.offer.college = college;
     }
     if(offer.group_id){
         const group = groupsService.getGroup(offer.group_id);
         if(!group) return next("Invalid group id");
-        res.locals.offer.group = group;
+        // res.locals.offer.group = group;
     }
     next();
 }
 
 async function postOffer(req, res, next){
-    const {offer} = res.locals;
-    delete offer.college;
-    delete offer.company;
-    delete offer.group;
-    service.postOffer(offer).then(data => res.send(data))
+    const {offer} = req.body;
+    const fields = [
+        "offer_title",
+        "offer_details",
+        "offer_link",
+        "company_id", 
+        "group_id", 
+        "college_id", 
+    ];
+    for (const field of fields) {
+        if(offer[field] !== undefined) res.locals.offer[field] = offer[field];
+    }
+    service.postOffer(res.locals.offer).then(data => res.send({offer: data[0]}))
         .catch(err => {
             next(err);
         });
 }
-async function updateOffer(req, res, next){
-    const {offer} = res.locals;
-    delete offer.college;
-    delete offer.company;
-    delete offer.group;
-    if(offer.college_id) offer.college_id = +offer.college_id;
-    await service.updateOffer(offer).then(()=>res.send({message: "ok"})).catch(next);
+function updateOffer(req, res, next){
+    const {offer} = req.body;
+    const fields = [
+        "offer_title",
+        "offer_details",
+        "offer_link",
+        "company_id", 
+        "group_id", 
+        "college_id", 
+    ];
+    for (const field of fields) {
+        if(offer[field] !== undefined) res.locals.offer[field] = offer[field];
+    }
+    service.updateOffer(res.locals.offer).then(()=>res.send({message: "ok"})).catch(next);
 }
 
 module.exports = {
@@ -110,5 +122,5 @@ module.exports = {
     getOffer: [validateOfferId, getOffer],
     deleteOffer: [validateOfferId, deleteOffer],
     postOffer: [validateOffer, postOffer],
-    updateOffer: [validateOffer, updateOffer],
+    updateOffer: [validateOfferId, updateOffer],
 };

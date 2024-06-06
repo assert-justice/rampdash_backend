@@ -16,7 +16,7 @@ router.get("/:offer_id", isLoggedIn, controller.getOffer);
 // post a new offer
 router.post("/", isAdmin, controller.postOffer);
 // update an offer
-router.patch("/", isAdmin, controller.updateOffer);
+router.patch("/:offer_id", isAdmin, controller.updateOffer);
 // delete an offer
 router.delete("/:offer_id", isAdmin, controller.deleteOffer);
 
