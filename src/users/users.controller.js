@@ -1,16 +1,13 @@
 const service = require("./users.service");
 const collegeService = require("../colleges/colleges.service");
 const groupService = require("../groups/groups.service");
+const inviteService = require("../invites/invites.service");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-// const cookieParser = require("cookie-parser");
+const { body, validationResult } = require('express-validator');
 
 async function listUsers(req, res){
     const users = await service.listUsers();
-    // TODO: remove the hashed passwords for pete's sake
-    for (const user of users) {
-        // delete user.user_pwd;
-    }
     res.send(users);
 }
 
@@ -41,11 +38,7 @@ function loginUser(req, res, next){
         if(bcrypt.compareSync(user_pwd, user.user_pwd)){
             // create token
             const token = jwt.sign({ userId: user.user_id }, process.env.SECRET, { expiresIn: '1h' });
-            // console.log(user);
             res.send({user, token});
-            // res.cookie("user", user.user_role, {signed: true});
-            // delete user.user_pwd;
-            // res.send(user);
         }
         else{
             next("Invalid password!");
@@ -53,55 +46,27 @@ function loginUser(req, res, next){
     }).catch(next);
 }
 
-function validateUser(req, res, next){
-    const user = req.body.user;
-    if(!user) return next("No user supplied");
-    const fields = [
-        "user_name",
-        "user_role",
-        "user_email",
-    ];
-    for (const field of fields) {
-        if(user[field] === undefined) {
-            const message = `Missing field ${field}!`;
-            return next(message);
-        }
-    }
-    // just to be certain. updating passwords is separate
-    delete user.user_pwd;
-    const {user_role, college_id, group_id} = user;
-    res.locals.user = user;
-    if(user_role === "admin") return next();
-    if(!college_id) return next("No college id provided!");
-    const college = collegeService.getCollege(college_id);
-    if(!college) return next("No such college!");
-    res.locals.college = college;
-    if(group_id === undefined){
-        return next();
-    }
-    // const group = groupService.getCollege(user.group_id);
-    // if(!college) return next("no such group");
-    // if(group.college_id !== user.college_id) return next("user college and group college do not match");
-    // res.locals.group = group;
-    next();
-}
-
 async function updatePassword(req, res, next){
     // get account, make sure it's activated
     // hash that sucker
-    const user = res.locals.user;
-    const {user_id, user_pwd, /*user_email, user_name*/} = user;
-    // if(!user_id) return next("Missing user id!");
-    // const user = await service.getUser(user_id);
-    // if(!user) return next("Invalid user id!");
-    // if(user.user_activated) return next("User has already been activated!");
-    if(!user_pwd) return next("User password is required");
-    // set active
-    // user.user_activated = true;
-    const saltRounds = 10;
-    bcrypt.hash(user_pwd, saltRounds).then(hash => {
-        user.user_pwd = hash;
-        service.updateUser(user)
+    const validators = [
+        body("user").isObject(),
+        body("user.user_pwd").isString().notEmpty().escape(),
+        body("user.new_user_pwd").isString().notEmpty().escape(),
+    ];
+    for (const val of validators) {
+        const result = await val.run(req);
+        if(!result.isEmpty()){
+            const err = result.array()[0];
+            const message = `${err.msg} '${err.value}' at path ${err.path}`;
+            return next(message);
+        }
+    }
+    const {user_pwd, new_user_pwd} = req.body.user;
+    // TODO: confirm old user password is a match
+    bcrypt.hash(new_user_pwd, 10).then(hash => {
+        res.locals.user.user_pwd = hash;
+        service.updateUser(res.locals.user)
             .then(()=>res.send({message: "ok"}))
             .catch(e=>{
                 next(e);
@@ -109,24 +74,42 @@ async function updatePassword(req, res, next){
     });
 }
 
-function postUser(req, res, next){
-    // res.locals.user.user_activated = false;
-    service.postUser(res.locals.user).then(data => res.send({user: data[0]})).catch(next);
-}
+// function postUser(req, res, next){
+//     service.postUser(res.locals.user).then(data => res.send({user: data[0]})).catch(next);
+// }
 async function activateUser(req, res, next){
-    const {user_id, user_pwd, /*user_email, user_name*/} = req.body;
-    if(!user_id) return next("Missing user id!");
-    const user = await service.getUser(user_id);
-    if(!user) return next("Invalid user id!");
-    if(user.user_activated) return next("User has already been activated!");
-    if(!user_pwd) return next("User password is required");
-    // set active
-    user.user_activated = true;
-    const saltRounds = 10;
-    bcrypt.hash(user_pwd, saltRounds).then(hash => {
+    const {invite_code} = req.params;
+    let invite;
+    if(!invite_code) return next("No invite code");
+    try{
+        invite = await inviteService.getInviteByCode(invite_code);
+    }
+    catch(e){
+        return next(e);
+    }
+    const validators = [
+        body("user").isObject(),
+        body("user.user_name").isString().notEmpty().escape(),
+        body("user.user_email").isEmail().escape(),
+        body("user.user_pwd").isString().notEmpty(),
+    ];
+    for (const val of validators) {
+        const result = await val.run(req);
+        if(!result.isEmpty()){
+            const err = result.array()[0];
+            const message = `${err.msg} '${err.value}' at path ${err.path}`;
+            return next(message);
+        }
+    }
+    const {user} = req.body;
+    user.user_role = invite.user_role;
+    user.college_id = invite.college_id;
+    user.group_id = invite.group_id;
+    const {user_pwd} = user;
+    bcrypt.hash(user_pwd, 8).then(hash => {
         user.user_pwd = hash;
-        service.updateUser(user)
-            .then(()=>res.send({message: "ok"}))
+        service.postUser(user)
+            .then(data=>res.send({user: data[0]}))
             .catch(e=>{
                 next(e);
             });
@@ -140,7 +123,11 @@ function updateUser(req, res, next){
         "user_name",
         "user_email",
     ];
-    if(res.locals.current_user.user_role === "admin") fields.push("user_role");
+    if(res.locals.current_user.user_role === "admin") {
+        fields.push("user_role");
+        fields.push("college_id");
+        fields.push("group_id");
+    }
     for (const field of fields) {
         if(user[field] !== undefined) res.locals.user[field] = user[field];
     }
@@ -158,10 +145,10 @@ function deleteUser(_, res, next){
 module.exports = {
     listUsers,
     getUser: [validateUserId, getUser],
-    updatePassword: [validateUserId, updatePassword],
+    // postUser: [validateUser, postUser],
     loginUser,
-    postUser: [validateUser, postUser],
     updateUser: [validateUserId, updateUser],
+    updatePassword: [validateUserId, updatePassword],
     activateUser,
     deleteUser: [validateUserId, deleteUser],
 };

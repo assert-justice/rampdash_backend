@@ -18,9 +18,8 @@ function getInvite(req, res, next){
     res.send(res.locals.invite);
 }
 async function postInvite(req, res, next){
-    const {invite} = req.body;
-    if(!invite) return next("No invite provided");
     const validators = [
+        body("invite").isObject(),
         body("invite.user_role").isString().notEmpty().escape(),
         body("invite.college_id").optional().isNumeric(),
         body("invite.group_id").optional().isNumeric(),
@@ -33,6 +32,7 @@ async function postInvite(req, res, next){
             return next(message);
         }
     }
+    const {invite} = req.body;
     invite.invite_status = "pending";
     invite.invite_code = crypto.randomUUID();
     //TODO: check for key collisions properly

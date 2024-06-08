@@ -50,7 +50,7 @@ exports.up = function(knex) {
     })
     .createTable("users", (table)=>{
         table.increments("user_id").notNullable();
-        table.string("user_name").notNullable();
+        table.string("user_name").notNullable().unique();
         table.string("user_email").notNullable();
         table.string("user_role").notNullable();
         // table.boolean("user_activated").notNullable();

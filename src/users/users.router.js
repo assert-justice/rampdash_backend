@@ -8,10 +8,10 @@ router.get("/", auth.isAdmin, controller.listUsers);
 
 // get specific user
 router.post("/login", controller.loginUser);
-router.get("/:user_id", auth.isAdmin, controller.getUser);
+router.get("/:user_id", auth.isSelfOrAdmin, controller.getUser);
 
 // create a new user
-router.post("/", auth.isAdmin, controller.postUser);
+// router.post("/", auth.isAdmin, controller.postUser);
 
 // create a user with an invite code
 router.post("/activate/:invite_code", controller.activateUser);
