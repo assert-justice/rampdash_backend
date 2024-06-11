@@ -35,7 +35,7 @@ async function validateCollege(req, res, next){
     if(!college) return next("No college provided");
     const validators = [
         body("college.college_name").isString().notEmpty().escape(),
-        body("college.college_logo").isURL().notEmpty().escape(),
+        body("college.college_logo").isURL().notEmpty(),
     ];
     for (const val of validators) {
         const result = await val.run(req);

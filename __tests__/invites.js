@@ -30,7 +30,7 @@ describe("Invites routes", ()=>{
         const token = await getAdminToken();
         const response = await request(app)
             .post(`/invites?token=${token}`)
-            .send({invite:{user_role: "admin"}})
+            .send({invite:{invite_code: "test_code", user_role: "admin", invite_max_uses: 0}})
             .expect('Content-Type', /json/)
             .expect(200);
         expect(response.body).toEqual(

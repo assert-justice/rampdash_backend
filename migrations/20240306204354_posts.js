@@ -70,6 +70,8 @@ exports.up = function(knex) {
         table.increments("invite_id").notNullable();
         table.string("invite_status").notNullable();
         table.string("invite_code").unique().notNullable();
+        table.integer("invite_uses").notNullable();
+        table.integer("invite_max_uses").notNullable();
         // table.string("user_name").notNullable();
         // table.string("user_email").notNullable();
         table.string("user_role").notNullable();

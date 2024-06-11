@@ -77,13 +77,17 @@
     "invites":[
         {
             "invite_status": "pending",
-            "invite_code": "admin inv code",
-            "user_role": "admin"
+            "invite_code": "admin_inv_code",
+            "user_role": "admin",
+            "invite_uses": 1,
+            "invite_max_uses": 1
         },
         {
             "invite_status": "pending",
-            "invite_code": "student inv code",
+            "invite_code": "student_inv_code",
             "user_role": "student",
+            "invite_uses": 1,
+            "invite_max_uses": 100,
             "college_id": 1,
             "group_id": 1
         }

@@ -1,6 +1,6 @@
 const db = require("../db");
 
-const inviteFields = ["invite_id", "invite_status", "invite_code", "user_role", "group_id", "college_id"];
+const inviteFields = ["invite_id", "invite_status", "invite_code", "user_role", "group_id", "college_id", "invite_uses", "invite_max_uses"];
 
 function listInvites(){
     return db("invites").select(...inviteFields);
@@ -21,6 +21,12 @@ function updateInvite(invite){
 function deleteInvite(invite_id){
     return db("invites").where({invite_id}).delete();
 }
+// async function isInviteValid(invite_id){
+//     // returns a bool in a promise
+//     const invite = await getInvite(invite_id);
+//     if(!invite) return false;
+// }
+// async function incrementInvite(invite_id){}
 
 module.exports = {
     listInvites,

@@ -52,7 +52,7 @@ async function validateOffer(req, res, next){
     const validators = [
         body("offer.offer_title").isString().notEmpty().escape(),
         body("offer.offer_details").isString().escape(),
-        body("offer.offer_link").isURL().notEmpty().escape(),
+        body("offer.offer_link").isURL().notEmpty(),
         body("offer.company_id").isNumeric(),
         body("offer.college_id").isNumeric().optional(),
         body("offer.group_id").isNumeric().optional(),

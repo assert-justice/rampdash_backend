@@ -30,6 +30,7 @@ function loginUser(req, res, next){
     for (const field of requiredFields) {
         if(!req.body[field]) return next(`Required field '${field}' not found!`);
     }
+    // console.log(req.body);
     const {user_name, user_pwd} = req.body;
     service.loginUser(user_name).then(user => {
         if(!user) {
@@ -38,6 +39,7 @@ function loginUser(req, res, next){
         if(bcrypt.compareSync(user_pwd, user.user_pwd)){
             // create token
             const token = jwt.sign({ userId: user.user_id }, process.env.SECRET, { expiresIn: '1h' });
+            delete user.user_pwd;
             res.send({user, token});
         }
         else{
@@ -87,6 +89,11 @@ async function activateUser(req, res, next){
     catch(e){
         return next(e);
     }
+    if(!invite) return next("Invalid invite");
+    // if invite_max_uses is 0 the invite can be used indefinitely
+    if(invite.invite_max_uses && invite.invite_uses >= invite.invite_max_uses) return next("Invite uses exceeded!");
+    invite.invite_uses++;
+    inviteService.updateInvite(invite);
     const validators = [
         body("user").isObject(),
         body("user.user_name").isString().notEmpty().escape(),

@@ -25,8 +25,8 @@ async function validateCompany(req, res, next){
     const validators = [
         body("company.company_name").isString().notEmpty().escape(),
         body("company.company_description").isString().escape(),
-        body("company.company_logo").isURL().notEmpty().escape(),
-        body("company.company_website").isURL().notEmpty().escape(),
+        body("company.company_logo").isURL().notEmpty(),
+        body("company.company_website").isURL().notEmpty(),
     ];
     for (const val of validators) {
         const result = await val.run(req);

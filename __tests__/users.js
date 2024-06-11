@@ -18,11 +18,11 @@ function getToken(user_name, user_pwd){
         .then(res => res.body.token)
 }
 
-function getInvite(token, user_role, college_id, group_id){
+function getInvite(token, user_role, college_id, group_id, invite_max_uses = 0){
     // const token = await getAdminToken();
     return request(app)
         .post(`/invites?token=${token}`)
-        .send({invite:{user_role, college_id, group_id}})
+        .send({invite:{invite_code: "test_code", user_role, college_id, group_id, invite_max_uses}})
         .expect('Content-Type', /json/)
         .expect(200).then(data => data.body.invite);
 }

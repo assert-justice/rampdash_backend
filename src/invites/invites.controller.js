@@ -18,11 +18,15 @@ function getInvite(req, res, next){
     res.send(res.locals.invite);
 }
 async function postInvite(req, res, next){
+    if(req.body.college_id === null) req.body.college_id = undefined;
+    if(req.body.group_id === null) req.body.group_id = undefined;
     const validators = [
         body("invite").isObject(),
         body("invite.user_role").isString().notEmpty().escape(),
-        body("invite.college_id").optional().isNumeric(),
-        body("invite.group_id").optional().isNumeric(),
+        body("invite.invite_code").isString().notEmpty().escape(),
+        body("invite.invite_max_uses").isNumeric(),
+        // body("invite.college_id").optional().isNumeric(),
+        // body("invite.group_id").optional().isNumeric(),
     ];
     for (const val of validators) {
         const result = await val.run(req);
@@ -33,8 +37,9 @@ async function postInvite(req, res, next){
         }
     }
     const {invite} = req.body;
+    invite.invite_uses = 0;
     invite.invite_status = "pending";
-    invite.invite_code = crypto.randomUUID();
+    // invite.invite_code = crypto.randomUUID();
     //TODO: check for key collisions properly
     service.postInvite(invite).then(invite => res.send({invite: invite[0]})).catch(next);
 }
