@@ -2,14 +2,14 @@ const db = require("../db");
 
 function listOffers(){
     return db("offers")
-    // .join("companies", "offers.company_id", "=", "companies.company_id")
+    .join("companies", "offers.company_id", "=", "companies.company_id")
     .select("*");
 }
 function listCollegeOffers(college_id){
     return db("offers")
     .where({college_id})
     .orWhereNull("college_id")
-    // .join("companies", "offers.company_id", "=", "companies.company_id")
+    .join("companies", "offers.company_id", "=", "companies.company_id")
     .select("*");
 }
 

@@ -10,6 +10,14 @@ function validateInviteId(req, res, next){
         next();
     }).catch(next);
 }
+function validateInviteCode(req, res, next){
+    const {invite_code} = req.params;
+    if(!invite_code) return next("No invite id provided");
+    service.getInviteByCode(invite_code).then(invite => {
+        res.locals.invite = invite;
+        next();
+    }).catch(next);
+}
 // crud
 function listInvites(req, res, next){
     service.listInvites().then(data => res.send(data)).catch(e => next(e));
@@ -54,7 +62,7 @@ function deleteInvite(req, res, next){
 module.exports = {
     listInvites,
     getInvite: [validateInviteId, getInvite],
-    // getInviteByCode: [validateInviteCode, getInvite],
+    getInviteByCode: [validateInviteCode, getInvite],
     postInvite,
     deleteInvite: [validateInviteId, deleteInvite],
 }

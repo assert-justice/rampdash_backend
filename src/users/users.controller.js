@@ -93,7 +93,7 @@ async function activateUser(req, res, next){
     // if invite_max_uses is 0 the invite can be used indefinitely
     if(invite.invite_max_uses && invite.invite_uses >= invite.invite_max_uses) return next("Invite uses exceeded!");
     invite.invite_uses++;
-    inviteService.updateInvite(invite);
+    await inviteService.updateInvite(invite);
     const validators = [
         body("user").isObject(),
         body("user.user_name").isString().notEmpty().escape(),

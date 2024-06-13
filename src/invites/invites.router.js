@@ -8,7 +8,7 @@ router.get("/", isAdmin, controller.listInvites);
 
 // get specific invite
 router.get("/:invite_id", isAdmin, controller.getInvite);
-// router.get("/code/:invite_code", isAdmin, controller.getInvite);
+router.get("/code/:invite_code", controller.getInviteByCode);
 
 // post a new invite
 router.post("/", isAdmin, controller.postInvite);

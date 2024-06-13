@@ -7,10 +7,10 @@ const auth = require("../auth_middleware");
 router.get("/", auth.isAdmin, controller.listUsers);
 
 // get specific user
-router.post("/login", controller.loginUser);
 router.get("/:user_id", auth.isSelfOrAdmin, controller.getUser);
 
 // create a new user
+router.post("/login", controller.loginUser);
 // router.post("/", auth.isAdmin, controller.postUser);
 
 // create a user with an invite code
